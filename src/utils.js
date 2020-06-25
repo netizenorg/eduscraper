@@ -9,6 +9,7 @@ function cleanStr (str, urls, brs) {
   if (urls) {
     str = str
       .replace(/href="\/en-US/g, 'href="https://developer.mozilla.org/en-US')
+      .replace(/href="/g, 'target="_blank" href="')
   }
   if (brs) {
     str = str
