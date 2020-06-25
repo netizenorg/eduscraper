@@ -1,0 +1,23 @@
+{
+  "name": "edu-nfo-scrapers",
+  "version": "1.0.0",
+  "description": "web scrapers for creating web literacy info modules/files",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js all output"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/netizenorg/edu-nfo-scrapers.git"
+  },
+  "author": "netizen.org <hi@netizen.org>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/netizenorg/edu-nfo-scrapers/issues"
+  },
+  "homepage": "https://github.com/netizenorg/edu-nfo-scrapers#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3"
+  }
+}
