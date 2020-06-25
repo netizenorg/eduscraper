@@ -31,8 +31,15 @@ async function scrapeHTMLElementsNFO (destination, cb) {
         data.description.text = $(ch).text()
       }
     })
+
     data.singleton = isSingleton(data.element.name)
-    dictionary[data.element.name] = data
+
+    const hs = 'h1, h2, h3, h4, h5, h6'
+    if (data.element.name === hs) {
+      hs.split(',').forEach(h => { dictionary[h.replace(/\s/g, '')] = data })
+    } else {
+      dictionary[data.element.name] = data
+    }
   })
 
   save(dictionary, `${destination}/html-elements.json`)
