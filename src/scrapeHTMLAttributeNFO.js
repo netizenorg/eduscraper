@@ -1,22 +1,6 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
-const fs = require('fs')
-
-function cleanStr (str, urls, brs) {
-  if (urls) {
-    str = str
-      .replace(/href="\/en/g, 'href="https://developer.mozilla.org/en')
-  }
-  if (brs) {
-    str = str
-      .replace(/\n\s\s\s\s/g, '')
-      .replace(/\n\s\s\s/g, '')
-      .replace(/\n\s\s/g, '')
-      .replace(/\n\s/g, '')
-      .replace(/\n/g, '')
-  }
-  return str
-}
+const { save, cleanStr } = require('./utils.js')
 
 async function scrapeHTMLAttributeNFO (destination, cb) {
   const url = 'https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes#Attribute_list'
@@ -24,6 +8,7 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
 
   const code = res.request.res.statusCode
   if (code !== 200) return cb(code)
+  else if (!res.data) cb(res)
 
   const dictionary = {}
   const $ = cheerio.load(res.data)
@@ -63,10 +48,7 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
     dictionary[data.attribute] = data
   })
 
-  const str = JSON.stringify(dictionary, null, 2)
-  fs.writeFile(`${destination}/html-attributes.json`, str, (err) => {
-    if (err) console.log(err)
-  })
+  save(dictionary, `${destination}/html-attributes.json`)
 }
 
 module.exports = scrapeHTMLAttributeNFO
