@@ -17,7 +17,9 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
     const data = {}
     $(ele).children().each((j, ch) => {
       if (j === 0) {
-        data.attribute = $(ch).text().replace(/\s/g, '')
+        data.attribute = {}
+        data.attribute.html = cleanStr($(ch).html(), true, false)
+        data.attribute.text = $(ch).text().replace(/\s/g, '')
         const icon = $(ch).children()[1]
         if (icon) {
           const t = $(icon).attr('title')
@@ -45,7 +47,7 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
         } else data.note = null
       }
     })
-    dictionary[data.attribute] = data
+    dictionary[data.attribute.text] = data
   })
 
   save(dictionary, `${destination}/html-attributes.json`)
