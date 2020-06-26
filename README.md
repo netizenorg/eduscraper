@@ -1,4 +1,4 @@
-# edu-nfo-scrapers
+# eduscraper
 
 web scrapers for creating web literacy info modules/files
 
