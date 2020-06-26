@@ -1,10 +1,10 @@
 {
-  "name": "edu-nfo-scrapers",
+  "name": "eduscraper",
   "version": "1.0.0",
-  "description": "web scrapers for creating web literacy info modules/files",
+  "description": "web scrapers for creating web literacy info modules/files throughout other netizen projects",
   "main": "index.js",
-  "scripts": {
-    "test": "node index.js all output"
+  "bin": {
+    "eduscraper": "./index.js"
   },
   "repository": {
     "type": "git",
