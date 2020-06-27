@@ -114,6 +114,17 @@ function mergeData (dict, data, type) {
   return dict
 }
 
+function cleanData (dict) {
+  for (const prop in dict) {
+    if (typeof dict[prop] === 'boolean') {
+      dict[prop] = {
+        description: 'no information available'
+      }
+    }
+  }
+  return dict
+}
+
 async function scrapeCSSPropertiesNFO (destination, cb) {
   let dictionary = cmcss.propertyKeywords
   // console.log(Object.keys(dictionary).length) // 426
@@ -130,6 +141,7 @@ async function scrapeCSSPropertiesNFO (destination, cb) {
   // console.log(Object.keys(d3).length) // 213
   dictionary = mergeData(dictionary, d3, 'w3schools')
 
+  dictionary = cleanData(dictionary)
   save(dictionary, `${destination}/css-properties.json`)
 }
 

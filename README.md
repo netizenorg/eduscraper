@@ -1,8 +1,11 @@
+**!!! WORK IN PROGRESS !!!**
+
+
 # eduscraper
 
-web scrapers for creating web literacy info modules/files
+web scrapers for creating web literacy info modules/files throughout other netizen projects
 
-`node index.js [all|attributes|elements|properties|etc] [destination]`
+`./index.js [all|attributes|elements|properties|etc] [destination]`
 
 # Sources
 
@@ -24,6 +27,3 @@ web scrapers for creating web literacy info modules/files
 - https://en.wikipedia.org/wiki/Document_type_declaration
 - https://www.w3schools.com/tags/tag_doctype.asp
 - https://www.w3schools.com/tags/ref_html_dtd.asp
-
-
-**WORK IN PROGRESS**
