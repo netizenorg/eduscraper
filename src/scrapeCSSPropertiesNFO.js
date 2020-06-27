@@ -1,7 +1,7 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
 const cmcss = require('./data/cm-css-mode.json')
-// const { save, cleanStr, isSingleton } = require('./utils.js')
+const { save } = require('./utils.js')
 
 async function scrapeCSSTricks (cb) {
   const url = 'https://css-tricks.com/almanac/'
@@ -11,14 +11,30 @@ async function scrapeCSSTricks (cb) {
   if (code !== 200) return cb(code)
   else if (!res.data) cb(res)
 
+  const edgeCases = [
+    'grid-row / grid-column',
+    'grid-template-columns / grid-template-rows',
+    'top / bottom / left / right'
+  ]
   const dictionary = {}
   const $ = cheerio.load(res.data)
   $('.property-list > ol').each((i, ele) => {
     $(ele).children().each((i, ch) => {
       const a = $(ch).first().children()[0]
-      dictionary[$(a).text()] = {
-        urls: {
-          'css-tricks': $(a).attr('href')
+      const prop = $(a).text()
+      if (edgeCases.includes(prop)) {
+        prop.split(' / ').forEach(p => {
+          dictionary[p] = {
+            urls: {
+              'css-tricks': $(a).attr('href')
+            }
+          }
+        })
+      } else {
+        dictionary[prop] = {
+          urls: {
+            'css-tricks': $(a).attr('href')
+          }
         }
       }
     })
@@ -46,7 +62,7 @@ async function scrapeRawMDNdata (cb) {
       }
     }
   }
-
+  delete dictionary['--*']
   return dictionary
 }
 
@@ -63,32 +79,58 @@ async function scrapeW3Schools (cb) {
   $('.w3-table-all tr').each((i, ele) => {
     const a = $($(ele).children()[0]).children()[0]
     const info = $(ele).children()[1]
-    dictionary[$(a).text()] = {
-      description: $(info).text(),
-      urls: {
-        w3schools: $(a).attr('href')
+    const prop = $(a).text()
+    if (prop !== '' && !prop.includes('@')) {
+      dictionary[prop] = {
+        description: $(info).text(),
+        urls: {
+          w3schools: 'https://www.w3schools.com/cssref/' + $(a).attr('href')
+        }
       }
     }
   })
   return dictionary
 }
 
+function mergeData (dict, data, type) {
+  for (const prop in data) {
+    if (typeof dict[prop] === 'boolean') dict[prop] = {}
+    if (typeof dict[prop] !== 'object') dict[prop] = {}
+    if (!Object.prototype.hasOwnProperty.call(dict[prop], 'urls')) {
+      dict[prop].urls = {}
+    }
+
+    if (type === 'css-tricks') {
+      dict[prop].urls['css-tricks'] = data[prop].urls['css-tricks']
+    } else if (type === 'raw-mdn') {
+      dict[prop].default = data[prop].default
+      dict[prop].status = data[prop].status
+      dict[prop].urls.mdn = data[prop].urls.mdn
+    } else if (type === 'w3schools') {
+      dict[prop].description = data[prop].description
+      dict[prop].urls.w3schools = data[prop].urls.w3schools
+    }
+  }
+  return dict
+}
+
 async function scrapeCSSPropertiesNFO (destination, cb) {
-  // const dictionary = {}
+  let dictionary = cmcss.propertyKeywords
+  // console.log(Object.keys(dictionary).length) // 426
 
-  const dictionary = cmcss.propertyKeywords
-  console.log(Object.keys(dictionary).length) // 426
+  const d1 = await scrapeCSSTricks(cb)
+  // console.log(Object.keys(d1).length) // 181
+  dictionary = mergeData(dictionary, d1, 'css-tricks')
 
-  // const d = await scrapeCSSTricks(cb)
-  // console.log(Object.keys(d).length) // 181
+  const d2 = await scrapeRawMDNdata(cb)
+  // console.log(Object.keys(d2).length) // 362 standard (499 total)
+  dictionary = mergeData(dictionary, d2, 'raw-mdn')
 
-  // const d = await scrapeRawMDNdata(cb)
-  // console.log(Object.keys(d).length) // 499 (362 standard)
+  const d3 = await scrapeW3Schools(cb)
+  // console.log(Object.keys(d3).length) // 213
+  dictionary = mergeData(dictionary, d3, 'w3schools')
 
-  // const d = await scrapeW3Schools(cb)
-  // console.log(Object.keys(d).length) // 213
-
-  // save(dictionary, `${destination}/html-elements.json`)
+  save(dictionary, `${destination}/css-properties.json`)
 }
 
 module.exports = scrapeCSSPropertiesNFO
