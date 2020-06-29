@@ -18,17 +18,14 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
     $(ele).children().each((j, ch) => {
       if (j === 0) {
         data.attribute = {}
-        data.attribute.html = cleanStr($(ch).html(), true, false)
+        data.attribute.html = cleanStr($($(ch).children()[0]).html(), true, false)
         data.attribute.text = $(ch).text().replace(/\s/g, '')
+        data.status = 'standard'
         const icon = $(ch).children()[1]
         if (icon) {
           const t = $(icon).attr('title')
-          if (t.includes('experimental')) data.experimental = true
-          else data.experimental = false
-          if (t.includes('depreciated')) data.depreciated = true
-          else data.deprecated = false
-        } else {
-          data.experimental = data.deprecated = false
+          if (t.includes('experimental')) data.status = 'experimental'
+          else if (t.includes('deprecated')) data.status = 'obsolete'
         }
       } else if (j === 1) {
         data.elements = {}

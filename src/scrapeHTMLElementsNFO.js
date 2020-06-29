@@ -17,11 +17,13 @@ async function scrapeHTMLElementsNFO (destination, cb) {
     // { element, description, singleton, depreciated }
     const data = {}
     const warning = $(ele).parent().parent().prev().hasClass('warning')
-    if (warning) data.deprecated = true
-    else data.depreciated = false
+    if (warning) data.status = 'obsolete'
+    else data.status = 'standard'
     $(ele).children().each((j, ch) => {
       if (j === 0) {
         data.element = {}
+        const url = $($(ch).children()[0]).attr('href')
+        data.url = 'https://developer.mozilla.org/' + url
         data.element.html = cleanStr($(ch).html(), true, false)
         data.element.text = $(ch).text()
         data.element.name = $(ch).text().replace(/[<>]/g, '')

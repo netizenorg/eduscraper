@@ -81,8 +81,9 @@ async function scrapeW3Schools (cb) {
     const info = $(ele).children()[1]
     const prop = $(a).text()
     if (prop !== '' && !prop.includes('@')) {
+      const txt = $(info).text()
       dictionary[prop] = {
-        description: $(info).text(),
+        description: { html: txt, text: txt },
         urls: {
           w3schools: 'https://www.w3schools.com/cssref/' + $(a).attr('href')
         }
@@ -117,8 +118,19 @@ function mergeData (dict, data, type) {
 function cleanData (dict) {
   for (const prop in dict) {
     if (typeof dict[prop] === 'boolean') {
+      const txt = 'no information available'
       dict[prop] = {
-        description: 'no information available'
+        property: { html: prop, text: prop },
+        description: { html: txt, text: txt }
+      }
+    } else {
+      const url = (dict[prop].urls.mdn) ? dict[prop].urls.mdn
+        : (dict[prop].urls['css-tricks']) ? dict[prop].urls['css-tricks']
+          : (dict[prop].urls.w3schools) ? dict[prop].urls.w3schools : undefined
+      dict[prop].url = url
+      dict[prop].property = {
+        html: `<a href="${url}" target="_blank">${prop}</a>`,
+        text: prop
       }
     }
   }
