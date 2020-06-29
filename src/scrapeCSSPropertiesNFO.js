@@ -116,9 +116,9 @@ function mergeData (dict, data, type) {
 }
 
 function cleanData (dict) {
+  const txt = 'no information available'
   for (const prop in dict) {
     if (typeof dict[prop] === 'boolean') {
-      const txt = 'no information available'
       dict[prop] = {
         property: { html: prop, text: prop },
         description: { html: txt, text: txt }
@@ -131,6 +131,9 @@ function cleanData (dict) {
       dict[prop].property = {
         html: `<a href="${url}" target="_blank">${prop}</a>`,
         text: prop
+      }
+      if (!dict[prop].description) {
+        dict[prop].description = { html: txt, text: txt }
       }
     }
   }
