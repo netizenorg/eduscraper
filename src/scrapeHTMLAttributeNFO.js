@@ -41,6 +41,8 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
           data.note = {}
           data.note.html = cleanStr($(note).html(), true, true)
           data.note.text = cleanStr($(note).text(), false, true)
+          if (data.note.text.includes('legacy')) data.status = 'obsolete'
+          if (data.note.text.includes('obsolete')) data.status = 'obsolete'
         } else data.note = null
       }
     })
