@@ -13,13 +13,15 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
   const dictionary = {}
   const $ = cheerio.load(res.data)
   $('.standard-table > tbody > tr').each((i, ele) => {
-    // { attribute, elements, depreciated, experimental, note, description }
+    // { keyword, elements, depreciated, experimental, note, description }
     const data = {}
     $(ele).children().each((j, ch) => {
       if (j === 0) {
-        data.attribute = {}
-        data.attribute.html = cleanStr($($(ch).children()[0]).html(), true, false)
-        data.attribute.text = $(ch).text().replace(/\s/g, '')
+        data.keyword = {}
+        data.keyword.html = cleanStr($($(ch).children()[0]).html(), true, false)
+        data.keyword.text = $(ch).text().replace(/\s/g, '')
+        const url = $('a', ch).attr('href')
+        data.url = 'https://developer.mozilla.org/' + url
         data.status = 'standard'
         const icon = $(ch).children()[1]
         if (icon) {
@@ -46,10 +48,11 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
         } else data.note = null
       }
     })
-    dictionary[data.attribute.text] = data
+    dictionary[data.keyword.text] = data
   })
 
   save(dictionary, `${destination}/html-attributes.json`)
+  return dictionary
 }
 
 module.exports = scrapeHTMLAttributeNFO

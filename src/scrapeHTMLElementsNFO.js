@@ -21,12 +21,12 @@ async function scrapeHTMLElementsNFO (destination, cb) {
     else data.status = 'standard'
     $(ele).children().each((j, ch) => {
       if (j === 0) {
-        data.element = {}
+        data.keyword = {}
         const url = $($(ch).children()[0]).attr('href')
         data.url = 'https://developer.mozilla.org/' + url
-        data.element.html = cleanStr($(ch).html(), true, false)
-        data.element.text = $(ch).text()
-        data.element.name = $(ch).text().replace(/[<>]/g, '')
+        data.keyword.html = cleanStr($(ch).html(), true, false)
+        data.keyword.text = $(ch).text()
+        data.keyword.name = $(ch).text().replace(/[<>]/g, '')
       } else if (j === 1) {
         data.description = {}
         data.description.html = cleanStr($(ch).html(), true, false)
@@ -34,17 +34,18 @@ async function scrapeHTMLElementsNFO (destination, cb) {
       }
     })
 
-    data.singleton = isSingleton(data.element.name)
+    data.singleton = isSingleton(data.keyword.name)
 
     const hs = 'h1, h2, h3, h4, h5, h6'
-    if (data.element.name === hs) {
+    if (data.keyword.name === hs) {
       hs.split(',').forEach(h => { dictionary[h.replace(/\s/g, '')] = data })
     } else {
-      dictionary[data.element.name] = data
+      dictionary[data.keyword.name] = data
     }
   })
 
   save(dictionary, `${destination}/html-elements.json`)
+  return dictionary
 }
 
 module.exports = scrapeHTMLElementsNFO

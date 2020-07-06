@@ -128,7 +128,7 @@ function cleanData (dict) {
         : (dict[prop].urls['css-tricks']) ? dict[prop].urls['css-tricks']
           : (dict[prop].urls.w3schools) ? dict[prop].urls.w3schools : undefined
       dict[prop].url = url
-      dict[prop].property = {
+      dict[prop].keyword = {
         html: `<a href="${url}" target="_blank">${prop}</a>`,
         text: prop
       }
@@ -158,6 +158,7 @@ async function scrapeCSSPropertiesNFO (destination, cb) {
 
   dictionary = cleanData(dictionary)
   save(dictionary, `${destination}/css-properties.json`)
+  return dictionary
 }
 
 module.exports = scrapeCSSPropertiesNFO
