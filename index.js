@@ -10,7 +10,7 @@ const scrapeCSSColors = require('./src/scrapeCSSColors.js')
 const scrapeCSSPseudo = require('./src/scrapeCSSPseudo.js')
 const pseudoDesc = require('./src/scrapeCSSPseudoDescriptions.js')
 const scrapeCSSDataTypes = require('./src/scrapeCSSDataTypes.js')
-
+const scrapeCSSAtRules = require('./src/scrapeCSSAtRules.js')
 
 const { save } = require('./src/utils.js')
 
@@ -72,6 +72,11 @@ async function main () {
   if (setting === 'all' || setting === 'data-types') {
     scrapeCSSDataTypes(destination, err)
     console.log('completed: css-data-types.json')
+  }
+
+  if (setting === 'all' || setting === 'at-rules') {
+    scrapeCSSAtRules(destination, err)
+    console.log('completed: css-at-rules.json')
   }
 
   if (setting === 'all' || setting === 'pseudo-elements') {
