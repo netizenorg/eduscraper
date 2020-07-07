@@ -15,7 +15,7 @@ async function scrapeCSSPseudo (url, file, destination, cb) {
     const str = $('a', ele).text()
     const eid = str.indexOf('(:')
     const end = eid === -1 ? str.length : eid
-    const name = $('a', ele).text().substr(0, end)
+    const name = $('a', ele).text().substr(0, end).replace(/\s/g, '')
 
     const root = 'https://developer.mozilla.org'
     let peURL = root + $('a', ele).attr('href')
