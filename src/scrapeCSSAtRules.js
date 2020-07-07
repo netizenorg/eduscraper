@@ -18,8 +18,14 @@ async function scrapCSSColors (destination, cb) {
     if (str.indexOf('@') === 0 && !dictionary[str]) {
       const rURL = root + $(ele).attr('href')
       const desc = $(ele).attr('title')
+      const std = $(ele).next()
+      let status = 'standard'
+      if (std && $(std).attr('title') && $(std).attr('title').includes('experimental')) {
+        status = 'experimental'
+      }
       dictionary[str] = {
         url: rURL,
+        status: status,
         keyword: {
           html: rURL ? `<a target="_blank" href="${rURL}">${str}</a>` : str,
           text: str
