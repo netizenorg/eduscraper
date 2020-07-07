@@ -14,7 +14,7 @@ async function scrapCSSColors (destination, cb) {
   const $ = cheerio.load(res.data)
   $('.w3-table tr').each((i, ele) => {
     const first = $(ele).children()[0]
-    const color = $(first).text().replace(/\s/g, '')
+    const color = $(first).text().replace(/\s/g, '').toLowerCase()
     dictionary[color] = { name: color }
     $($(ele).children()).each((i, el) => {
       if (i === 1) dictionary[color].hex = '#' + $(el).text()
@@ -23,7 +23,7 @@ async function scrapCSSColors (destination, cb) {
       }
     })
   })
-  delete dictionary.Colorname
+  delete dictionary.colorname
   save(dictionary, `${destination}/css-colors.json`)
   return dictionary
 }
