@@ -2,7 +2,7 @@
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-web scrapers for creating web literacy info modules/files throughout other netizen projects. It stores the data in JSON files. run:  `./index.js [type] [destination]` where `[destination]` is a relative path to a directory you want to save the files into, and `[type]` can be either: attributes, elements, properties, colors, data-types, pseudo-elements, pseudo-classes or all.
+web scrapers for creating web literacy info modules/files throughout other netizen projects. It stores the data in JSON files. run:  `./index.js [type] [destination]` where `[destination]` is a relative path to a directory you want to save the files into, and `[type]` can be either: attributes, elements, properties, colors, data-types, pseudo-elements, pseudo-classes, at-rules or all.
 
 each JSON file is a "dictionary" where the keys are things like html-element names or css-property names and their values are objects that looke like:
 
