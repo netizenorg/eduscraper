@@ -11,6 +11,8 @@ const scrapeCSSPseudo = require('./src/scrapeCSSPseudo.js')
 const pseudoDesc = require('./src/scrapeCSSPseudoDescriptions.js')
 const scrapeCSSDataTypes = require('./src/scrapeCSSDataTypes.js')
 const scrapeCSSAtRules = require('./src/scrapeCSSAtRules.js')
+const scrapeJSRefs = require('./src/scrapeJSRefs.js')
+const jsRefDesc = require('./src/scrapeJSRefDescription.js')
 
 const { save } = require('./src/utils.js')
 
@@ -40,13 +42,29 @@ async function addPseudoDescriptions (cssPseudo, file) {
     } else {
       cssPseudo[pe].description = { html: null, text: null }
     }
+    console.log('...', pe)
   }
   save(cssPseudo, `${destination}/${file}.json`)
 }
 
+async function scrapeJSRefDescription (jsRefs, file) {
+  for (const jsr in jsRefs) {
+    if (jsRefs[jsr].url) {
+      const desc = await jsRefDesc(jsRefs[jsr].url, err)
+      jsRefs[jsr].description = desc
+    } else {
+      jsRefs[jsr].description = { html: null, text: null }
+    }
+    console.log('...', jsr)
+  }
+  save(jsRefs, `${destination}/${file}.json`)
+}
+
 async function main () {
   let htmlAttr, htmlEles
-  let cssPseudoEles, cssPseudoClasses
+  let cssPseudoEles, cssPseudoClasses, jsRefs
+
+  // HTML
 
   if (setting === 'all' || setting === 'attributes') {
     htmlAttr = await scrapeHTMLAttributeNFO(destination, err)
@@ -58,6 +76,8 @@ async function main () {
     if (htmlAttr && htmlEles) elements2attributes(htmlEles, htmlAttr)
     console.log('completed: html-elements.json')
   }
+
+  // CSS
 
   if (setting === 'all' || setting === 'properties') {
     scrapeCSSPropertiesNFO(destination, err)
@@ -91,6 +111,15 @@ async function main () {
     cssPseudoClasses = await scrapeCSSPseudo(url, 'css-pseudo-classes', destination, err)
     addPseudoDescriptions(cssPseudoClasses, 'css-pseudo-classes')
     console.log('completed: css-pseudo-classes.json')
+  }
+
+  // JS
+
+  if (setting === 'all' || setting === 'js-refs') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference'
+    jsRefs = await scrapeJSRefs(url, 'js-refs', destination, err)
+    scrapeJSRefDescription(jsRefs, 'js-refs')
+    console.log('completed: js-refs.json')
   }
 }
 
