@@ -14,6 +14,17 @@ const scrapeCSSAtRules = require('./src/scrapeCSSAtRules.js')
 const scrapeJSRefs = require('./src/scrapeJSRefs.js')
 const jsRefDesc = require('./src/scrapeJSRefDescription.js')
 const scrapeJSwindow = require('./src/scrapeJSwindow.js')
+const scrapeJSdocument = require('./src/scrapeJSdocument.js')
+const scrapeJShistory = require('./src/scrapeJShistory.js')
+const scrapeJSlocation = require('./src/scrapeJSlocation.js')
+const scrapeJSnavigator = require('./src/scrapeJSnavigator.js')
+const scrapeJSmath = require('./src/scrapeJSmath.js')
+const scrapeJSdate = require('./src/scrapeJSdate.js')
+const scrapeJSstring = require('./src/scrapeJSstring.js')
+const scrapeJSnumber = require('./src/scrapeJSnumber.js')
+const scrapeJSDOMnode = require('./src/scrapeJSDOMnode.js')
+const scrapeJScanvas = require('./src/scrapeJScanvas.js')
+const scrapeJSevents = require('./src/scrapeJSevents.js')
 
 const { save } = require('./src/utils.js')
 
@@ -50,29 +61,31 @@ async function addPseudoDescriptions (cssPseudo, file) {
 
 async function scrapeJSRefDescription (jsRefs, file) {
   for (const jsr in jsRefs) {
-    if (jsRefs[jsr].url) {
-      const desc = await jsRefDesc(jsRefs[jsr].url, err)
-      jsRefs[jsr].description = desc
-    } else {
-      jsRefs[jsr].description = { html: null, text: null }
+    if (!jsRefs[jsr].description) {
+      if (jsRefs[jsr].url) {
+        const desc = await jsRefDesc(jsRefs[jsr].url, err)
+        jsRefs[jsr].description = desc
+      } else {
+        jsRefs[jsr].description = { html: null, text: null }
+      }
+      console.log('...', jsr)
     }
-    console.log('...', jsr)
   }
   save(jsRefs, `${destination}/${file}.json`)
 }
 
 async function main () {
   let htmlAttr, htmlEles
-  let cssPseudoEles, cssPseudoClasses, jsRefs
+  let cssPseudoEles, cssPseudoClasses, jsRefs, jsEvents
 
   // HTML
 
-  if (setting === 'all' || setting === 'attributes') {
+  if (setting === 'all' || setting === 'html' || setting === 'attributes') {
     htmlAttr = await scrapeHTMLAttributeNFO(destination, err)
     console.log('completed: html-attributes.json')
   }
 
-  if (setting === 'all' || setting === 'elements') {
+  if (setting === 'all' || setting === 'html' || setting === 'elements') {
     htmlEles = await scrapeHTMLElementsNFO(destination, err)
     if (htmlAttr && htmlEles) elements2attributes(htmlEles, htmlAttr)
     console.log('completed: html-elements.json')
@@ -80,34 +93,34 @@ async function main () {
 
   // CSS
 
-  if (setting === 'all' || setting === 'properties') {
+  if (setting === 'all' || setting === 'css' || setting === 'properties') {
     scrapeCSSPropertiesNFO(destination, err)
     console.log('completed: properties')
   }
 
-  if (setting === 'all' || setting === 'colors') {
+  if (setting === 'all' || setting === 'css' || setting === 'colors') {
     scrapeCSSColors(destination, err)
     console.log('completed: css-colors.json')
   }
 
-  if (setting === 'all' || setting === 'data-types') {
+  if (setting === 'all' || setting === 'css' || setting === 'data-types') {
     scrapeCSSDataTypes(destination, err)
     console.log('completed: css-data-types.json')
   }
 
-  if (setting === 'all' || setting === 'at-rules') {
+  if (setting === 'all' || setting === 'css' || setting === 'at-rules') {
     scrapeCSSAtRules(destination, err)
     console.log('completed: css-at-rules.json')
   }
 
-  if (setting === 'all' || setting === 'pseudo-elements') {
+  if (setting === 'all' || setting === 'css' || setting === 'pseudo-elements') {
     const url = 'https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements'
     cssPseudoEles = await scrapeCSSPseudo(url, 'css-pseudo-elements', destination, err)
     addPseudoDescriptions(cssPseudoEles, 'css-pseudo-elements')
     console.log('completed: css-pseudo-elements.json')
   }
 
-  if (setting === 'all' || setting === 'pseudo-classes') {
+  if (setting === 'all' || setting === 'css' || setting === 'pseudo-classes') {
     const url = 'https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes'
     cssPseudoClasses = await scrapeCSSPseudo(url, 'css-pseudo-classes', destination, err)
     addPseudoDescriptions(cssPseudoClasses, 'css-pseudo-classes')
@@ -116,17 +129,84 @@ async function main () {
 
   // JS
 
-  if (setting === 'all' || setting === 'js-refs') {
+  if (setting === 'all' || setting === 'js' || setting === 'js-refs') {
     const url = 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference'
     jsRefs = await scrapeJSRefs(url, 'js-refs', destination, err)
     scrapeJSRefDescription(jsRefs, 'js-refs')
     console.log('completed: js-refs.json')
   }
 
-  if (setting === 'all' || setting === 'js-window') {
+  if (setting === 'all' || setting === 'js' || setting === 'js-window') {
     const url = 'https://developer.mozilla.org/en-US/docs/Web/API/Window'
     scrapeJSwindow(url, 'js-window', destination, err)
     console.log('completed: js-window.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-document') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/document'
+    scrapeJSdocument(url, 'js-document', destination, err)
+    console.log('completed: js-document.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-history') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/history'
+    scrapeJShistory(url, 'js-history', destination, err)
+    console.log('completed: js-history.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-location') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/location'
+    scrapeJSlocation(url, 'js-location', destination, err)
+    console.log('completed: js-location.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-navigator') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/navigator'
+    scrapeJSnavigator(url, 'js-navigator', destination, err)
+    console.log('completed: js-navigator.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-math') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math'
+    scrapeJSmath(url, 'js-math', destination, err)
+    console.log('completed: js-math.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-date') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date'
+    scrapeJSdate(url, 'js-date', destination, err)
+    console.log('completed: js-date.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-string') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String'
+    scrapeJSstring(url, 'js-string', destination, err)
+    console.log('completed: js-string.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-number') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number'
+    scrapeJSnumber(url, 'js-number', destination, err)
+    console.log('completed: js-number.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-dom-node') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/Node'
+    scrapeJSDOMnode(url, 'js-dom-node', destination, err)
+    console.log('completed: js-dom-node.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-canvas') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D'
+    scrapeJScanvas(url, 'js-canvas', destination, err)
+    console.log('completed: js-canvas.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-events') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/Events#Standard_events'
+    jsEvents = await scrapeJSevents(url, 'js-events', destination, err)
+    scrapeJSRefDescription(jsEvents, 'js-events')
+    console.log('completed: js-events.json')
   }
 }
 

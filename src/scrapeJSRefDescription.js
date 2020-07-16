@@ -1,5 +1,6 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
+const { cleanStr } = require('./utils.js')
 
 async function scrapeJSRefDescription (url, cb) {
   const res = await axios.get(url)
@@ -9,11 +10,14 @@ async function scrapeJSRefDescription (url, cb) {
   else if (!res.data) cb(res)
 
   const $ = cheerio.load(res.data)
-  const article = $('#wikiArticle > p')[0]
+  const article = $('#wikiArticle p')[0]
+    ? $('#wikiArticle p')[0] : $('.seoSummary')
+
   const description = {
-    html: $(article).html(),
+    html: cleanStr($(article).html(), true),
     text: $(article).text()
   }
+
   return description
 }
 
