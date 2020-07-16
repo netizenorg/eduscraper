@@ -39,3 +39,7 @@ some of the JSON files have alternative structures and others additional informa
 - https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Types
 - https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-elements
 - https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes
+
+## JS NFO
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
+- https://developer.mozilla.org/en-US/docs/Web/API

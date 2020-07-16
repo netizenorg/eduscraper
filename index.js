@@ -13,6 +13,7 @@ const scrapeCSSDataTypes = require('./src/scrapeCSSDataTypes.js')
 const scrapeCSSAtRules = require('./src/scrapeCSSAtRules.js')
 const scrapeJSRefs = require('./src/scrapeJSRefs.js')
 const jsRefDesc = require('./src/scrapeJSRefDescription.js')
+const scrapeJSwindow = require('./src/scrapeJSwindow.js')
 
 const { save } = require('./src/utils.js')
 
@@ -120,6 +121,12 @@ async function main () {
     jsRefs = await scrapeJSRefs(url, 'js-refs', destination, err)
     scrapeJSRefDescription(jsRefs, 'js-refs')
     console.log('completed: js-refs.json')
+  }
+
+  if (setting === 'all' || setting === 'js-window') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/Window'
+    scrapeJSwindow(url, 'js-window', destination, err)
+    console.log('completed: js-window.json')
   }
 }
 
