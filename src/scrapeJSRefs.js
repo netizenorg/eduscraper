@@ -102,6 +102,10 @@ async function scrapeJSRefs (url, file, destination, cb) {
       }
     }
 
+    if (name !== '(' && name.includes('(')) {
+      name = name.substr(0, name.indexOf('('))
+    }
+
     if (switchURL[name]) url = switchURL[name]
 
     if (!ignore.includes(name)) {

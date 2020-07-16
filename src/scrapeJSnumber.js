@@ -47,7 +47,7 @@ async function scrapeJSnfo (url, file, destination, cb) {
     const fullName = $(link).text().replace(/\s/g, '')
     if (fullName.indexOf('Number') === 0) {
       if (fullName === 'Number()') {
-        dictionary.String = constructor
+        dictionary.Number = constructor
         return
       }
 
