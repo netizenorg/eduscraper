@@ -25,6 +25,7 @@ const scrapeJSnumber = require('./src/scrapeJSnumber.js')
 const scrapeJSDOMnode = require('./src/scrapeJSDOMnode.js')
 const scrapeJScanvas = require('./src/scrapeJScanvas.js')
 const scrapeJSevents = require('./src/scrapeJSevents.js')
+const scrapeJSarrays = require('./src/scrapeJSarrays.js')
 
 const { save } = require('./src/utils.js')
 
@@ -207,6 +208,12 @@ async function main () {
     jsEvents = await scrapeJSevents(url, 'js-events', destination, err)
     scrapeJSRefDescription(jsEvents, 'js-events')
     console.log('completed: js-events.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-arrays') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array'
+    scrapeJSarrays(url, 'js-arrays', destination, err)
+    console.log('completed: js-arrays.json')
   }
 }
 
