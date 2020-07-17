@@ -46,6 +46,45 @@ const documentNfo = {
   }
 }
 
+const historyNfo = {
+  status: 'standard',
+  url: 'https://developer.mozilla.org/en-US/docs/Web/API/History_API',
+  keyword: {
+    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/History_API">history</a>',
+    text: 'history'
+  },
+  description: {
+    html: 'The DOM <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window"><code>Window</code></a> object provides access to the browser\'s session history (not to be confused for <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/history">WebExtensions history</a>) through the <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window/history"><code>history</code></a> object. It exposes useful methods and properties that let you navigate back and forth through the user\'s history, and manipulate the contents of the history stack.',
+    text: 'The DOM Window object provides access to the browser\'s session history (not to be confused for WebExtensions history) through the history object. It exposes useful methods and properties that let you navigate back and forth through the user\'s history, and manipulate the contents of the history stack.'
+  }
+}
+
+const locationNfo = {
+  status: 'standard',
+  url: 'https://developer.mozilla.org/en-US/docs/Web/API/Location',
+  keyword: {
+    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Location">location</a>',
+    text: 'location'
+  },
+  description: {
+    html: 'The <strong><code>Location</code></strong> interface represents the location (URL) of the object it is linked to. Changes done on it are reflected on the object it relates to. Both the <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Document"><code>Document</code></a> and <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window"><code>Window</code></a> interface have such a linked <code>Location</code>, accessible via <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Document/location"><code>Document.location</code></a> and <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window/location"><code>Window.location</code></a> respectively.',
+    text: 'The Location interface represents the location (URL) of the object it is linked to. Changes done on it are reflected on the object it relates to. Both the Document and Window interface have such a linked Location, accessible via Document.location and Window.location respectively.'
+  }
+}
+
+const navigatorNfo = {
+  status: 'standard',
+  url: 'https://developer.mozilla.org/en-US/docs/Web/API/Navigator',
+  keyword: {
+    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator">navigator</a>',
+    text: 'navigator'
+  },
+  description: {
+    html: 'The <code><strong>Navigator</strong></code> interface represents the state and the identity of the user agent. It allows scripts to query it and to register themselves to carry on some activities.',
+    text: 'The Navigator interface represents the state and the identity of the user agent. It allows scripts to query it and to register themselves to carry on some activities.'
+  }
+}
+
 async function scrapeJSnfo (url, file, destination, cb) {
   const res = await axios.get(url)
 
@@ -67,6 +106,9 @@ async function scrapeJSnfo (url, file, destination, cb) {
       const url = root + $(link).attr('href')
       if (name === 'window') dictionary[name] = windowNfo
       else if (name === 'document') dictionary[name] = documentNfo
+      else if (name === 'location') dictionary[name] = locationNfo
+      else if (name === 'navigator') dictionary[name] = navigatorNfo
+      else if (name === 'history') dictionary[name] = historyNfo
       else {
         dictionary[name] = {
           status: status,
