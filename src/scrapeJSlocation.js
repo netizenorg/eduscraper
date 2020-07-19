@@ -33,6 +33,7 @@ async function scrapeJSnfo (url, file, destination, cb) {
     const fullName = $(link).text().replace(/\s/g, '')
     if (fullName.indexOf('Location') === 0) {
       const name = fullName.split('.')[1].split('()')[0]
+      const label = fullName.includes('()') ? name + '()' : name
       const descText = $($(ele).next()).text()
       const descHTML = cleanStr($($(ele).next()).html(), true)
       const status = checkForStatus($, ele)
@@ -42,8 +43,8 @@ async function scrapeJSnfo (url, file, destination, cb) {
         status: status,
         url: url,
         keyword: {
-          html: url ? `<a target="_blank" href="${url}">${name}</a>` : name,
-          text: name
+          html: url ? `<a target="_blank" href="${url}">${label}</a>` : label,
+          text: label
         },
         description: { html: descHTML, text: descText }
       }

@@ -24,8 +24,8 @@ const constructor = {
   status: 'standard',
   url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number',
   keyword: {
-    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number">Number</a>',
-    text: 'Number'
+    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/Number">Number()</a>',
+    text: 'Number()'
   },
   description: {
     html: 'The <strong><code>Number()</code> constructor</strong> creates a <a  target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number"><code>Number</code></a> object.',
@@ -53,7 +53,11 @@ async function scrapeJSnfo (url, file, destination, cb) {
 
       const arr = fullName.split('.')
       let name = arr[arr.length - 1]
-      if (name.includes('(')) name = name.substr(0, name.indexOf('('))
+      let label = name
+      if (name.includes('(')) {
+        name = name.substr(0, name.indexOf('('))
+        label = name + '()'
+      }
 
       const descText = $($(ele).next()).text()
       const descHTML = cleanStr($($(ele).next()).html(), true)
@@ -64,8 +68,8 @@ async function scrapeJSnfo (url, file, destination, cb) {
         status: status,
         url: url,
         keyword: {
-          html: url ? `<a target="_blank" href="${url}">${name}</a>` : name,
-          text: name
+          html: url ? `<a target="_blank" href="${url}">${label}</a>` : label,
+          text: label
         },
         description: { html: descHTML, text: descText }
       }

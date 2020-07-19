@@ -24,8 +24,8 @@ const constructor = {
   status: 'standard',
   url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/String',
   keyword: {
-    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/String">String</a>',
-    text: 'String'
+    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/String">String()</a>',
+    text: 'String()'
   },
   description: {
     html: 'The <strong><code>String</code></strong> constructor is used to create a new <a target="_blank" href="https://developer.mozilla.or/en-US/docs/Web/JavaScript/Reference/Global_Objects/String"><code>String</code></a> object. It performs type conversion when called as a function, rather than as a constructor, which is usually more useful.',
@@ -67,6 +67,8 @@ async function scrapeJSnfo (url, file, destination, cb) {
         if (name.includes('(')) name = name.substr(0, name.indexOf('('))
       }
 
+      const label = fullName.includes('(') ? name + '()' : name
+
       const descText = $($(ele).next()).text()
       const descHTML = cleanStr($($(ele).next()).html(), true)
       const status = checkForStatus($, ele)
@@ -76,8 +78,8 @@ async function scrapeJSnfo (url, file, destination, cb) {
         status: status,
         url: url,
         keyword: {
-          html: url ? `<a target="_blank" href="${url}">${name}</a>` : name,
-          text: name
+          html: url ? `<a target="_blank" href="${url}">${label}</a>` : label,
+          text: label
         },
         description: { html: descHTML, text: descText }
       }

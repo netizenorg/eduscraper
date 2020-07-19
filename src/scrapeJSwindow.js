@@ -110,12 +110,13 @@ async function scrapeJSnfo (url, file, destination, cb) {
       else if (name === 'navigator') dictionary[name] = navigatorNfo
       else if (name === 'history') dictionary[name] = historyNfo
       else {
+        const label = fullName.includes('()') ? name + '()' : name
         dictionary[name] = {
           status: status,
           url: url,
           keyword: {
-            html: url ? `<a target="_blank" href="${url}">${name}</a>` : name,
-            text: name
+            html: url ? `<a target="_blank" href="${url}">${label}</a>` : label,
+            text: label
           },
           description: { html: descHTML, text: descText }
         }
