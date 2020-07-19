@@ -10,7 +10,9 @@ const ignore = [
   'for await...of',
   'Property accessors',
   '++A',
-  '--A'
+  '--A',
+  '[a, b] = [1, 2]',
+  '{a, b} = {a:1, b:2}'
 ]
 
 const translate = {
@@ -102,8 +104,10 @@ async function scrapeJSRefs (url, file, destination, cb) {
       }
     }
 
+    let print
     if (name !== '(' && name.includes('(')) {
       name = name.substr(0, name.indexOf('('))
+      print = name + '()'
     }
 
     if (switchURL[name]) url = switchURL[name]
@@ -113,8 +117,10 @@ async function scrapeJSRefs (url, file, destination, cb) {
         status: 'standard',
         url: url,
         keyword: {
-          html: url ? `<a target="_blank" href="${url}">${name}</a>` : name,
-          text: name
+          html: url
+            ? `<a target="_blank" href="${url}">${print || name}</a>`
+            : print || name,
+          text: print || name
         }
       }
     }
