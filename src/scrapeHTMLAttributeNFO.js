@@ -11,7 +11,7 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
   else if (!res.data) cb(res)
 
   const dictionary = {}
-  const $ = cheerio.load(res.data)
+  let $ = cheerio.load(res.data)
   $('.standard-table > tbody > tr').each((i, ele) => {
     // { keyword, elements, depreciated, experimental, note, description }
     const data = {}
@@ -21,7 +21,9 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
         data.keyword.html = cleanStr($($(ch).children()[0]).html(), true, false)
         data.keyword.text = $(ch).text().replace(/\s/g, '')
         const url = $('a', ch).attr('href')
-        data.url = 'https://developer.mozilla.org/' + url
+        const rel = $('a', ch).attr('rel')
+        if (rel !== 'nofollow') data.url = 'https://developer.mozilla.org/' + url
+        else data.url = undefined
         data.status = 'standard'
         const icon = $(ch).children()[1]
         if (icon) {
@@ -49,6 +51,30 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
       }
     })
     dictionary[data.keyword.text] = data
+  })
+
+  // w3schools as MDN backup...
+  const r2 = await axios.get('https://www.w3schools.com/tags/ref_attributes.asp')
+
+  const code2 = r2.request.res.statusCode
+  if (code2 !== 200) return cb(code2)
+  else if (!r2.data) cb(r2)
+
+  $ = cheerio.load(r2.data)
+  $('.w3-table-all > tbody > tr').each((i, ele) => {
+    const prop = $('td:nth-child(1)', ele).text()
+    if (dictionary[prop]) {
+      const o = dictionary[prop]
+      if (!o.url || o.url === 'https://developer.mozilla.org/undefined') {
+        const path = $('td:nth-child(1) > a', ele).attr('href')
+        if (path) o.url = `https://www.w3schools.com/tags/${path}`
+      }
+      if (!o.description.text) {
+        const nfo = $('td:nth-child(3)', ele).text()
+        o.description.text = nfo
+        o.description.html = nfo
+      }
+    }
   })
 
   save(dictionary, `${destination}/html-attributes.json`)

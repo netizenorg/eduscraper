@@ -27,6 +27,7 @@ some of the JSON files have alternative structures and others additional informa
 ## HTML NFO
 - https://developer.mozilla.org/en-US/docs/Web/HTML/Element
 - https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes#Attribute_list
+- https://www.w3schools.com/tags/ref_attributes.asp
 - https://www.lifewire.com/html-singleton-tags-3468620
 
 ## CSS NFO
