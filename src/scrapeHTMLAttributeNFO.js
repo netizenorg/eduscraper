@@ -67,7 +67,10 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
       const o = dictionary[prop]
       if (!o.url || o.url === 'https://developer.mozilla.org/undefined') {
         const path = $('td:nth-child(1) > a', ele).attr('href')
-        if (path) o.url = `https://www.w3schools.com/tags/${path}`
+        if (path) {
+          o.url = `https://www.w3schools.com/tags/${path}`
+          o.keyword.html = `<a target="_blank" href="${o.url}">${prop}</a>`
+        }
       }
       if (!o.description.text) {
         const nfo = $('td:nth-child(3)', ele).text()
