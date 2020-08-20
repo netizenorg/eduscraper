@@ -17,7 +17,7 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
         text: 'property'
       },
       url: 'https://ogp.me/',
-      status: 'experimental',
+      status: 'standard',
       elements: {
         html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta" title="The HTML &lt;meta&gt; element represents metadata that cannot be represented by other HTML meta-related elements, like &lt;base&gt;, &lt;link&gt;, &lt;script&gt;, &lt;style&gt; or &lt;title&gt;."><code>&lt;meta&gt;</code></a>',
         text: '<meta>'
