@@ -10,7 +10,25 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
   if (code !== 200) return cb(code)
   else if (!res.data) cb(res)
 
-  const dictionary = {}
+  const dictionary = {
+    property: {
+      keyword: {
+        html: '<a href="https://ogp.me/" target="_blank">property</a>',
+        text: 'property'
+      },
+      url: 'https://ogp.me/',
+      status: 'experimental',
+      elements: {
+        html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta" title="The HTML &lt;meta&gt; element represents metadata that cannot be represented by other HTML meta-related elements, like &lt;base&gt;, &lt;link&gt;, &lt;script&gt;, &lt;style&gt; or &lt;title&gt;."><code>&lt;meta&gt;</code></a>',
+        text: '<meta>'
+      },
+      description: {
+        html: 'This property is part of the (non-standard, but widely used) "<a href="https://ogp.me/" target="_blank">open graph protocol</a>". It\'s used to specify the data social media sites should use when created "cards" and other elements generated when users share a link to a web page.',
+        text: 'This property is part of the (non-standard, but widely used) "open graph protocol". It\'s used to specify the data social media sites should use when created "cards" and other elements generated when users share a link to a web page.'
+      }
+    }
+  }
+
   let $ = cheerio.load(res.data)
   $('.standard-table > tbody > tr').each((i, ele) => {
     // { keyword, elements, depreciated, experimental, note, description }
