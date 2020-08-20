@@ -23,8 +23,8 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
         text: '<meta>'
       },
       description: {
-        html: 'This property is part of the (non-standard, but widely used) "<a href="https://ogp.me/" target="_blank">open graph protocol</a>". It\'s used to specify the data social media sites should use when created "cards" and other elements generated when users share a link to a web page.',
-        text: 'This property is part of the (non-standard, but widely used) "open graph protocol". It\'s used to specify the data social media sites should use when created "cards" and other elements generated when users share a link to a web page.'
+        html: 'This property is part of the (non-standard, but widely used) "<a href="https://ogp.me/" target="_blank">open graph protocol</a>". It\'s used to specify the data social media sites should use when creating "cards" and other dynamically generated elements when users share a link to a web page.',
+        text: 'This property is part of the (non-standard, but widely used) "open graph protocol". It\'s used to specify the data social media sites should use when creating "cards" and other dynamically generated elements when users share a link to a web page.'
       }
     }
   }
