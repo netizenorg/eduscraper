@@ -1,6 +1,8 @@
 const axios = require('axios')
 const cheerio = require('cheerio')
 const { save, cleanStr } = require('./utils.js')
+// MDN no longer labeling 404 URLs as nofollow, this is a list of 404 links as of 12/28/2020
+const nofollows = require('./data/attr-url-no-follows')
 
 async function scrapeHTMLAttributeNFO (destination, cb) {
   const url = 'https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes#Attribute_list'
@@ -35,20 +37,18 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
     const data = {}
     $(ele).children().each((j, ch) => {
       if (j === 0) {
+        const svg = $(ch).find('svg').attr('class')
+        const status = svg ? svg.split(' ')[1] : 'standard'
+        $(ch).find('svg').remove()
         data.keyword = {}
         data.keyword.html = cleanStr($($(ch).children()[0]).html(), true, false)
         data.keyword.text = $(ch).text().replace(/\s/g, '')
         const url = $('a', ch).attr('href')
         const rel = $('a', ch).attr('rel')
-        if (rel !== 'nofollow') data.url = 'https://developer.mozilla.org/' + url
+        if (rel !== 'nofollow' && url !== undefined) data.url = 'https://developer.mozilla.org' + url
         else data.url = undefined
-        data.status = 'standard'
-        const icon = $(ch).children()[1]
-        if (icon) {
-          const t = $(icon).attr('title')
-          if (t.includes('experimental')) data.status = 'experimental'
-          else if (t.includes('deprecated')) data.status = 'obsolete'
-        }
+        data.urls = data.url ? [data.url] : []
+        data.status = status
       } else if (j === 1) {
         data.elements = {}
         data.elements.html = cleanStr($(ch).html(), true, false)
@@ -63,7 +63,7 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
           data.note = {}
           data.note.html = cleanStr($(note).html(), true, true)
           data.note.text = cleanStr($(note).text(), false, true)
-          if (data.note.text.includes('legacy')) data.status = 'obsolete'
+          if (data.note.text.includes('legacy')) data.status = 'legacy'
           if (data.note.text.includes('obsolete')) data.status = 'obsolete'
         } else data.note = null
       }
@@ -83,8 +83,12 @@ async function scrapeHTMLAttributeNFO (destination, cb) {
     const prop = $('td:nth-child(1)', ele).text()
     if (dictionary[prop]) {
       const o = dictionary[prop]
-      if (!o.url || o.url === 'https://developer.mozilla.org/undefined') {
-        const path = $('td:nth-child(1) > a', ele).attr('href')
+      const path = $('td:nth-child(1) > a', ele).attr('href')
+      if (path) {
+        const url = `https://www.w3schools.com/tags/${path}`
+        o.urls.push(url)
+      }
+      if (!o.url || nofollows.includes(o.keyword.text)) {
         if (path) {
           o.url = `https://www.w3schools.com/tags/${path}`
           o.keyword.html = `<a target="_blank" href="${o.url}">${prop}</a>`
