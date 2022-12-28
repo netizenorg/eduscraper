@@ -10,8 +10,9 @@ async function scrapeJSRefDescription (url, cb) {
   else if (!res.data) cb(res)
 
   const $ = cheerio.load(res.data)
-  const article = $('#wikiArticle p')[0]
-    ? $('#wikiArticle p')[0] : $('.seoSummary')
+  const article = $('.main-page-content p')[0]
+    ? $('.main-page-content p')[0] : $('#wikiArticle p')[0]
+      ? $('#wikiArticle p')[0] : $('.seoSummary')
 
   const description = {
     html: cleanStr($(article).html(), true),

@@ -61,16 +61,29 @@ async function addPseudoDescriptions (cssPseudo, file) {
 }
 
 async function scrapeJSRefDescription (jsRefs, file) {
-  for (const jsr in jsRefs) {
-    if (!jsRefs[jsr].description) {
-      if (jsRefs[jsr].url) {
-        const desc = await jsRefDesc(jsRefs[jsr].url, err)
-        jsRefs[jsr].description = desc
-      } else {
-        jsRefs[jsr].description = { html: null, text: null }
+  for (const jsr in jsRefs) { // events...
+    if (jsRefs[jsr] instanceof Array) {
+      for (let i = 0; i < jsRefs[jsr].length; i++) {
+        if (!jsRefs[jsr][i].description) {
+          if (jsRefs[jsr][i].url) {
+            const desc = await jsRefDesc(jsRefs[jsr][i].url, err)
+            jsRefs[jsr][i].description = desc
+          } else {
+            jsRefs[jsr][i].description = { html: null, text: null }
+          }
+        }
       }
-      console.log('...', jsr)
+    } else { // refs...
+      if (!jsRefs[jsr].description) {
+        if (jsRefs[jsr].url) {
+          const desc = await jsRefDesc(jsRefs[jsr].url, err)
+          jsRefs[jsr].description = desc
+        } else {
+          jsRefs[jsr].description = { html: null, text: null }
+        }
+      }
     }
+    console.log('...', jsr)
   }
   save(jsRefs, `${destination}/${file}.json`)
 }
