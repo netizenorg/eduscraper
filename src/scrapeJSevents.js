@@ -16,11 +16,12 @@ async function scrapeJSnfo (url, file, destination, cb) {
   let type = ''
   $('li', std).each((i, ele) => {
     const sub = $('a', ele)
-    const txt = $(sub[0]).text()
     const url = root + $(sub[0]).attr('href')
+    let txt = $(sub[0]).text()
     if (sub[0].children[0].name) {
       type = txt
     } else {
+      txt = txt.replace(' event', '')
       if (!dictionary[txt]) dictionary[txt] = []
       if ($(sub[0]).attr('class') !== 'page-not-created') {
         dictionary[txt].push({
