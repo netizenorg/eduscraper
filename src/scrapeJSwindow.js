@@ -2,129 +2,122 @@ const axios = require('axios')
 const cheerio = require('cheerio')
 const { save, cleanStr } = require('./utils.js')
 
-function checkForStatus ($, ele) {
-  let status = 'standard'
-  for (let i = 0; i < $(ele).children().length; i++) {
-    const child = $(ele).children()[i]
-    const t = $(child).attr('title')
-    if (t) {
-      if (t.includes('obsolete') || t.includes('deprecated')) {
-        status = 'obsolete'
-      } else if (t.includes('experimental')) {
-        status = 'experimental'
-      } else if (t.includes('not been standardized')) {
-        status = 'non-standard'
+function scrapeJSRefDescription (data) {
+  const $ = cheerio.load(data)
+  const article = $('.main-page-content p')[0]
+    ? $('.main-page-content p')[0] : $('#wikiArticle p')[0]
+      ? $('#wikiArticle p')[0] : $('.seoSummary')
+
+  const description = {
+    html: cleanStr($(article).html(), true),
+    text: $(article).text()
+  }
+
+  return description
+}
+
+const props = [ // Object.keys(window).join("', '")
+  'close', 'stop', 'focus', 'blur', 'open', 'alert', 'confirm', 'prompt', 'print', 'postMessage', 'captureEvents', 'releaseEvents', 'getSelection', 'getComputedStyle', 'matchMedia', 'moveTo', 'moveBy', 'resizeTo', 'resizeBy', 'scroll', 'scrollTo', 'scrollBy', 'getDefaultComputedStyle', 'scrollByLines', 'scrollByPages', 'sizeToContent', 'updateCommands', 'find', 'dump', 'setResizable', 'requestIdleCallback', 'cancelIdleCallback', 'requestAnimationFrame', 'cancelAnimationFrame', 'reportError', 'btoa', 'atob', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'queueMicrotask', 'createImageBitmap', 'structuredClone', 'fetch', 'self', 'name', 'history', 'customElements', 'locationbar', 'menubar', 'personalbar', 'scrollbars', 'statusbar', 'toolbar', 'status', 'closed', 'event', 'frames', 'length', 'opener', 'parent', 'frameElement', 'navigator', 'clientInformation', 'external', 'applicationCache', 'screen', 'innerWidth', 'innerHeight', 'scrollX', 'pageXOffset', 'scrollY', 'pageYOffset', 'screenLeft', 'screenTop', 'screenX', 'screenY', 'outerWidth', 'outerHeight', 'performance', 'mozInnerScreenX', 'mozInnerScreenY', 'devicePixelRatio', 'scrollMaxX', 'scrollMaxY', 'fullScreen', 'ondevicemotion', 'ondeviceorientation', 'onabsolutedeviceorientation', 'InstallTrigger', 'visualViewport', 'crypto', 'onabort', 'onblur', 'onfocus', 'onauxclick', 'onbeforeinput', 'oncanplay', 'oncanplaythrough', 'onchange', 'onclick', 'onclose', 'oncontextmenu', 'oncuechange', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragexit', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'ondurationchange', 'onemptied', 'onended', 'onformdata', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onloadeddata', 'onloadedmetadata', 'onloadstart', 'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onwheel', 'onpause', 'onplay', 'onplaying', 'onprogress', 'onratechange', 'onreset', 'onresize', 'onscroll', 'onsecuritypolicyviolation', 'onseeked', 'onseeking', 'onselect', 'onslotchange', 'onstalled', 'onsubmit', 'onsuspend', 'ontimeupdate', 'onvolumechange', 'onwaiting', 'onselectstart', 'onselectionchange', 'ontoggle', 'onpointercancel', 'onpointerdown', 'onpointerup', 'onpointermove', 'onpointerout', 'onpointerover', 'onpointerenter', 'onpointerleave', 'ongotpointercapture', 'onlostpointercapture', 'onmozfullscreenchange', 'onmozfullscreenerror', 'onanimationcancel', 'onanimationend', 'onanimationiteration', 'onanimationstart', 'ontransitioncancel', 'ontransitionend', 'ontransitionrun', 'ontransitionstart', 'onwebkitanimationend', 'onwebkitanimationiteration', 'onwebkitanimationstart', 'onwebkittransitionend', 'u2f', 'onerror', 'speechSynthesis', 'onafterprint', 'onbeforeprint', 'onbeforeunload', 'onhashchange', 'onlanguagechange', 'onmessage', 'onmessageerror', 'onoffline', 'ononline', 'onpagehide', 'onpageshow', 'onpopstate', 'onrejectionhandled', 'onstorage', 'onunhandledrejection', 'onunload', 'ongamepadconnected', 'ongamepaddisconnected', 'localStorage', 'origin', 'crossOriginIsolated', 'isSecureContext', 'indexedDB', 'caches', 'sessionStorage', 'window', 'document', 'location', 'top'
+]
+
+const filterOut = [
+  'InstallTrigger', 'clientInformation', 'setResizable', 'u2f', 'ontoggle', 'ondragexit', 'onabsolutedeviceorientation'
+]
+
+const req = async (url) => {
+  const res = await axios.get(url)
+  const code = res.request.res.statusCode
+  if (code !== 200) return { error: code }
+  else if (!res.data) return { error: 'no data' }
+  else return { data: res.data, url }
+}
+
+async function getNfo (p) {
+  try {
+    if (p.indexOf('on') === 0) {
+      const pe = p.substr(2)
+      try {
+        return await req(`https://developer.mozilla.org/en-US/docs/Web/API/Window/${pe}_event`)
+      } catch (err) {
+        try {
+          return await req(`https://developer.mozilla.org/en-US/docs/Web/API/Element/${pe}_event`)
+        } catch (err) {
+          try {
+            return await req(`https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/${pe}_event`)
+          } catch (err) {
+            try {
+              return await req(`https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/${pe}_event`)
+            } catch (err) {
+              try {
+                return await req(`https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/${pe}_event`)
+              } catch (err) {
+                try {
+                  return await req(`https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/${pe}_event`)
+                } catch (err) {
+                  try {
+                    return await req(`https://developer.mozilla.org/en-US/docs/Web/API/Node/${pe}_event`)
+                  } catch (err) {
+                    try {
+                      return await req(`https://developer.mozilla.org/en-US/docs/Web/API/HTMLSlotElement/${pe}_event`)
+                    } catch (err) {
+                      try {
+                        return await req(`https://developer.mozilla.org/en-US/docs/Web/API/HTMLTrackElement/${pe}_event`)
+                      } catch (err) {
+                        try {
+                          return await req(`https://developer.mozilla.org/en-US/docs/Web/API/Window/${pe}_event`)
+                        } catch (err) {
+                          try {
+                            return await req(`https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/${pe}_event`)
+                          } catch (err) {
+                            return { error: 'axios bug' }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
-  }
-  return status
-}
-
-const windowNfo = {
-  status: 'standard',
-  url: 'https://developer.mozilla.org/en-US/docs/Web/API/Window',
-  keyword: {
-    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window">window</a>',
-    text: 'window'
-  },
-  description: {
-    html: 'The <strong><code>Window</code></strong> interface represents a window containing a <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Glossary/DOM">DOM</a> document; the <code>document</code> property points to the <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Document">DOM document</a> loaded in that window.',
-    text: 'The Window interface represents a window containing a DOM document; the document property points to the DOM document loaded in that window. A window for a given document can be obtained using the document.defaultView property.'
-  }
-}
-
-const documentNfo = {
-  status: 'standard',
-  url: 'https://developer.mozilla.org/en-US/docs/Web/API/document',
-  keyword: {
-    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/document">document</a>',
-    text: 'document'
-  },
-  description: {
-    html: 'The <strong>Document</strong> interface represents any web page loaded in the browser and serves as an entry point into the web page\'s content, which is the <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Using_the_W3C_DOM_Level_1_Core">DOM tree</a>. The DOM tree includes elements such as <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body"><code>&lt;body&gt;</code></a> and <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table"><code>&lt;table&gt;</code></a>, among <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element">many others</a>. It provides functionality globally to the document, like how to obtain the page\'s URL and create new elements in the document.',
-    text: 'The Document interface represents any web page loaded in the browser and serves as an entry point into the web page\'s content, which is the DOM tree. The DOM tree includes elements such as <body> and <table>, among many others. It provides functionality globally to the document, like how to obtain the page\'s URL and create new elements in the document.'
-  }
-}
-
-const historyNfo = {
-  status: 'standard',
-  url: 'https://developer.mozilla.org/en-US/docs/Web/API/History_API',
-  keyword: {
-    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/History_API">history</a>',
-    text: 'history'
-  },
-  description: {
-    html: 'The DOM <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window"><code>Window</code></a> object provides access to the browser\'s session history (not to be confused for <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/history">WebExtensions history</a>) through the <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window/history"><code>history</code></a> object. It exposes useful methods and properties that let you navigate back and forth through the user\'s history, and manipulate the contents of the history stack.',
-    text: 'The DOM Window object provides access to the browser\'s session history (not to be confused for WebExtensions history) through the history object. It exposes useful methods and properties that let you navigate back and forth through the user\'s history, and manipulate the contents of the history stack.'
-  }
-}
-
-const locationNfo = {
-  status: 'standard',
-  url: 'https://developer.mozilla.org/en-US/docs/Web/API/Location',
-  keyword: {
-    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Location">location</a>',
-    text: 'location'
-  },
-  description: {
-    html: 'The <strong><code>Location</code></strong> interface represents the location (URL) of the object it is linked to. Changes done on it are reflected on the object it relates to. Both the <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Document"><code>Document</code></a> and <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window"><code>Window</code></a> interface have such a linked <code>Location</code>, accessible via <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Document/location"><code>Document.location</code></a> and <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Window/location"><code>Window.location</code></a> respectively.',
-    text: 'The Location interface represents the location (URL) of the object it is linked to. Changes done on it are reflected on the object it relates to. Both the Document and Window interface have such a linked Location, accessible via Document.location and Window.location respectively.'
-  }
-}
-
-const navigatorNfo = {
-  status: 'standard',
-  url: 'https://developer.mozilla.org/en-US/docs/Web/API/Navigator',
-  keyword: {
-    html: '<a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator">navigator</a>',
-    text: 'navigator'
-  },
-  description: {
-    html: 'The <code><strong>Navigator</strong></code> interface represents the state and the identity of the user agent. It allows scripts to query it and to register themselves to carry on some activities.',
-    text: 'The Navigator interface represents the state and the identity of the user agent. It allows scripts to query it and to register themselves to carry on some activities.'
+    return await req(`https://developer.mozilla.org/en-US/docs/Web/API/Window/${p}`)
+  } catch (err) {
+    try {
+      return await req(`https://developer.mozilla.org/en-US/docs/Web/API/${p}`)
+    } catch (err) {
+      return { error: 'axios bug' }
+    }
   }
 }
 
 async function scrapeJSnfo (url, file, destination, cb) {
-  const res = await axios.get(url)
-
-  const code = res.request.res.statusCode
-  if (code !== 200) return cb(code)
-  else if (!res.data) cb(res)
-
   const dictionary = {}
-  const $ = cheerio.load(res.data)
-  $('dt').each((i, ele) => {
-    const link = $('a', ele)
-    const fullName = $(link).text().replace(/\s/g, '')
-    if (fullName.indexOf('Window') === 0) {
-      const name = fullName.split('.')[1].split('()')[0]
-      const descText = $($(ele).next()).text()
-      const descHTML = cleanStr($($(ele).next()).html(), true)
-      const status = checkForStatus($, ele)
-      const root = 'https://developer.mozilla.org'
-      const url = root + $(link).attr('href')
-      if (name === 'window') dictionary[name] = windowNfo
-      else if (name === 'document') dictionary[name] = documentNfo
-      else if (name === 'location') dictionary[name] = locationNfo
-      else if (name === 'navigator') dictionary[name] = navigatorNfo
-      else if (name === 'history') dictionary[name] = historyNfo
-      else {
-        const label = fullName.includes('()') ? name + '()' : name
-        dictionary[name] = {
-          status: status,
-          url: url,
-          keyword: {
-            html: url ? `<a target="_blank" href="${url}">${label}</a>` : label,
-            text: label
-          },
-          description: { html: descHTML, text: descText }
-        }
+  const filtered = props
+    .filter(p => p.indexOf('onmoz') !== 0)
+    .filter(p => p.indexOf('onwebkit') !== 0)
+    .filter(p => !filterOut.includes(p))
+  filtered.forEach(async (p, i) => {
+    const data = await getNfo(p)
+    if (data.error) console.log(i, p, data)
+    else {
+      const url = data.url
+      const description = scrapeJSRefDescription(data.data)
+      dictionary[p] = {
+        url: url,
+        keyword: {
+          html: `<a target="_blank" href="${url}">${p}</a>`,
+          text: p
+        },
+        description
+      }
+      if (Object.keys(dictionary).length === filtered.length) {
+        save(dictionary, `${destination}/${file}.json`)
+        return dictionary
       }
     }
   })
-  save(dictionary, `${destination}/${file}.json`)
-  return dictionary
 }
 
 module.exports = scrapeJSnfo
