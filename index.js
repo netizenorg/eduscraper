@@ -23,7 +23,6 @@ const scrapeJSdate = require('./src/scrapeJSdate.js')
 const scrapeJSstring = require('./src/scrapeJSstring.js')
 const scrapeJSnumber = require('./src/scrapeJSnumber.js')
 const scrapeJSDOMnode = require('./src/scrapeJSDOMnode.js')
-const scrapeJScanvas = require('./src/scrapeJScanvas.js')
 const scrapeJSevents = require('./src/scrapeJSevents.js')
 const scrapeJSarrays = require('./src/scrapeJSarrays.js')
 
@@ -213,13 +212,31 @@ async function main () {
   if (setting === 'all' || setting === 'js' || setting === 'js-dom-element') {
     const url = 'https://developer.mozilla.org/en-US/docs/Web/API/Element'
     scrapeJSDOMnode(url, 'js-dom-element', destination, err)
-    console.log('completed: js-dom-node.json')
+    console.log('completed: js-dom-element.json')
   }
 
-  if (setting === 'all' || setting === 'js' || setting === 'js-canvas') {
+  if (setting === 'all' || setting === 'js' || setting === 'js-dom-event-target') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/EventTarget'
+    scrapeJSDOMnode(url, 'js-dom-event-target', destination, err)
+    console.log('completed: js-dom-event-target.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-dom-media') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement'
+    scrapeJSDOMnode(url, 'js-dom-media', destination, err)
+    console.log('completed: js-dom-media.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-dom-canvas') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement'
+    scrapeJSDOMnode(url, 'js-dom-canvas', destination, err)
+    console.log('completed: js-dom-canvas.json')
+  }
+
+  if (setting === 'all' || setting === 'js' || setting === 'js-canvas2d') {
     const url = 'https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D'
-    scrapeJScanvas(url, 'js-canvas', destination, err)
-    console.log('completed: js-canvas.json')
+    scrapeJSDOMnode(url, 'js-canvas2d', destination, err)
+    console.log('completed: js-canvas2d.json')
   }
 
   if (setting === 'all' || setting === 'js' || setting === 'js-events') {

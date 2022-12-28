@@ -6,13 +6,13 @@ function checkForStatus ($, ele) {
   let status = 'standard'
   for (let i = 0; i < $(ele).children().length; i++) {
     const child = $(ele).children()[i]
-    const t = $(child).attr('title')
+    const t = $(child).attr('class')
     if (t) {
       if (t.includes('obsolete') || t.includes('deprecated')) {
         status = 'obsolete'
       } else if (t.includes('experimental')) {
         status = 'experimental'
-      } else if (t.includes('not been standardized')) {
+      } else if (t.includes('nonstandard')) {
         status = 'non-standard'
       }
     }
@@ -32,7 +32,13 @@ async function scrapeJSnfo (url, file, destination, cb) {
   $('dt').each((i, ele) => {
     const link = $('a', ele)
     const fullName = $(link).text().replace(/\s/g, '')
-    if (fullName.indexOf('Node') === 0 || fullName.indexOf('Element') === 0) {
+    if (fullName.indexOf('Node') === 0 ||
+      fullName.indexOf('Element') === 0 ||
+      fullName.indexOf('EventTarget') === 0 ||
+      fullName.indexOf('CanvasRenderingContext2D') === 0 ||
+      fullName.indexOf('HTMLCanvasElement') === 0 ||
+      fullName.indexOf('HTMLMediaElement') === 0) {
+      // ...
       const arr = fullName.split('.')
       let name = arr[arr.length - 1]
       let label = name
