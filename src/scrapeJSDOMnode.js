@@ -32,7 +32,7 @@ async function scrapeJSnfo (url, file, destination, cb) {
   $('dt').each((i, ele) => {
     const link = $('a', ele)
     const fullName = $(link).text().replace(/\s/g, '')
-    if (fullName.indexOf('Node') === 0) {
+    if (fullName.indexOf('Node') === 0 || fullName.indexOf('Element') === 0) {
       const arr = fullName.split('.')
       let name = arr[arr.length - 1]
       let label = name

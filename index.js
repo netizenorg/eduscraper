@@ -210,6 +210,12 @@ async function main () {
     console.log('completed: js-dom-node.json')
   }
 
+  if (setting === 'all' || setting === 'js' || setting === 'js-dom-element') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/Element'
+    scrapeJSDOMnode(url, 'js-dom-element', destination, err)
+    console.log('completed: js-dom-node.json')
+  }
+
   if (setting === 'all' || setting === 'js' || setting === 'js-canvas') {
     const url = 'https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D'
     scrapeJScanvas(url, 'js-canvas', destination, err)
