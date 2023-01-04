@@ -215,6 +215,12 @@ async function main () {
     console.log('completed: js-dom-element.json')
   }
 
+  if (setting === 'all' || setting === 'js' || setting === 'js-html-element') {
+    const url = 'https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement'
+    scrapeJSDOMnode(url, 'js-html-element', destination, err)
+    console.log('completed: js-html-element.json')
+  }
+
   if (setting === 'all' || setting === 'js' || setting === 'js-dom-event-target') {
     const url = 'https://developer.mozilla.org/en-US/docs/Web/API/EventTarget'
     scrapeJSDOMnode(url, 'js-dom-event-target', destination, err)

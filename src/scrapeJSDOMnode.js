@@ -37,7 +37,8 @@ async function scrapeJSnfo (url, file, destination, cb) {
       fullName.indexOf('EventTarget') === 0 ||
       fullName.indexOf('CanvasRenderingContext2D') === 0 ||
       fullName.indexOf('HTMLCanvasElement') === 0 ||
-      fullName.indexOf('HTMLMediaElement') === 0) {
+      fullName.indexOf('HTMLMediaElement') === 0 ||
+      fullName.indexOf('HTMLElement') === 0) {
       // ...
       const arr = fullName.split('.')
       let name = arr[arr.length - 1]
