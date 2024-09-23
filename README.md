@@ -1,4 +1,4 @@
-# THIS REPO IS NOT LONGER BEING MAINTAINED
+# THIS REPO IS NO LONGER BEING MAINTAINED
 *(...it served its purpose)*
 <br>
 <br>
