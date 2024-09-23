@@ -1,3 +1,12 @@
+# THIS REPO IS NOT LONGER BEING MAINTAINED
+*(...it served its purpose)*
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
 # eduscraper
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
